@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Amigo Secreto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+
+<style>
+    body {
+        background-color: #c22c5f;
+        color: white;
+        /* background-image: url(./bg.png) */
+
+    }
+
+    .resultado {
+        background-color: #17d1bf;
+        border: 1px solid grey;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 25px;
+    }
+
+    .btn-sortear {
+        cursor: pointer;
+        border-radius: 10px;
+        margin-top: 25px;
+        background-color: #ffb207;
+        border-color: #d49303;
+        padding: 20px;
+    }
+
+    .btn-sortear:hover {
+        background-color: #ffb64a;
+        border-color: #d4ad03;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div class="container text-center" style="padding-top: 100px;">
+            <h3>Olá {{quem | capitalize}}!</h3>
+            <hr>
+            <div class=" btn-sortear  " v-show="!sorteado" @click="Sortear">
+                <h5>Clique aqui para sortear o amigo secreto</h5>
+            </div>
+            <img v-show="load" src="./img/load.svg" alt="load">
+
+            <div v-show="sorteado && resultado">
+                <div v-show="!erro">Seu amigo secreto é:</div>
+                <div class="resultado">
+                    <h1 v-show="erro"> {{msg}} {{quem | capitalize}}</h1>
+                    <h1 v-show="!erro"> {{amigo | capitalize}}</h1>
+                </div>
+            </div>
+
+        </div>
+        <!-- 
+        <h1>Links</h1>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=andrei"><h3>Andrei</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=danielle"><h3>Danielli</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=gabriel"><h3>Gabriel</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=isadora"><h3>Isadora</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=juliana"><h3>Juliana</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=marcelo"><h3>Marcelo</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=rafael"><h3>Rafael</h3></a>
+        <a href="https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=tereza"><h3>Tereza</h3></a> -->
+
+
+    </div>
+
+    <script>
+        Vue.filter('capitalize', function (value) {
+            if (!value) return ''
+            value = value.toString()
+            return value.charAt(0).toUpperCase() + value.slice(1)
+        })
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                sorteado: false,
+                quem: '',
+                amigo: '',
+                erro: false,
+                msg: '',
+                load: false,
+                resultado: false
+            },
+            created: function () {
+                this.quem = window.location.search.split("?quem=")[1] || "!"
+            },
+            methods: {
+                Sortear() {
+                    this.sorteado = true
+                    this.load = true
+                    let self = this
+                    let xhr = new XMLHttpRequest();
+                    let server =
+                        "https://script.google.com/macros/s/AKfycbwQi9JgcagfjE_MfOcIsWJWyfqjXFmqWy6fJEG8k8BchQF8_Po/exec?quem=" +
+                        this.quem
+                    xhr.open("GET", server);
+                    xhr.onload = function () {
+                        let resposta = xhr.responseText;
+                        resposta = JSON.parse(resposta);
+
+                        console.log(resposta)
+                        self.amigo = resposta.amigo
+                        self.load = false
+                        self.resultado = true
+                        if (resposta.erro) {
+                            self.erro = resposta.erro
+                            self.msg = "Ja foi sorteado o amigo secreto do(a)"
+                        }
+                    }
+                    xhr.send();
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
